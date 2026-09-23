@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Account Map</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --border:#e3e6ea; --text:#1a1d23; --sub:#6b7280;
+  --accent:#2563eb; --accent-ink:#ffffff;
+  --grow:#16a34a; --nurture:#2563eb; --monetize:#dc2626; --deprior:#6b7280;
+  --grow-bg:rgba(22,163,74,.08); --nurture-bg:rgba(37,99,235,.08);
+  --monetize-bg:rgba(220,38,38,.08); --deprior-bg:rgba(107,114,128,.08);
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.04);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14161a; --card:#1c1f26; --border:#2b2f38; --text:#eef0f3; --sub:#9aa3b1;
+    --grow-bg:rgba(22,163,74,.15); --nurture-bg:rgba(37,99,235,.15);
+    --monetize-bg:rgba(220,38,38,.15); --deprior-bg:rgba(107,114,128,.15);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14161a; --card:#1c1f26; --border:#2b2f38; --text:#eef0f3; --sub:#9aa3b1;
+  --grow-bg:rgba(22,163,74,.15); --nurture-bg:rgba(37,99,235,.15);
+  --monetize-bg:rgba(220,38,38,.15); --deprior-bg:rgba(107,114,128,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:24px 20px 48px;
+}
+.wrap{max-width:1080px; margin:0 auto;}
+header{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:20px;}
+h1{font-size:22px; margin:0 0 4px;}
+.sub{color:var(--sub); font-size:13.5px; margin:0;}
+.savebadge{font-size:12px; color:var(--sub); background:var(--card); border:1px solid var(--border); padding:5px 10px; border-radius:20px; white-space:nowrap;}
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin-bottom:22px;}
+.card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 10px; text-align:center; box-shadow:var(--shadow);}
+.card .n{font-size:24px; font-weight:700;}
+.card .l{font-size:11.5px; color:var(--sub); margin-top:2px;}
+.grid{display:grid; grid-template-columns:280px 1fr; gap:18px;}
+@media (max-width:760px){.grid{grid-template-columns:1fr;}}
+.panel{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; box-shadow:var(--shadow);}
+.panel h2{font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--sub); margin:0 0 14px;}
+label{display:block; font-size:12.5px; color:var(--sub); margin:12px 0 5px;}
+input[type=text],input[type=number]{
+  width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px;
+  background:var(--bg); color:var(--text); font-size:14px;
+}
+input[type=range]{width:100%;}
+.rangeval{font-weight:600; color:var(--accent);}
+.scorepair{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.hint{font-size:11px; color:var(--sub); margin-top:2px;}
+button{cursor:pointer; font-size:14px; border:none; border-radius:8px;}
+#addBtn{width:100%; margin-top:16px; padding:11px; background:var(--text); color:var(--bg); font-weight:600;}
+#addBtn:hover{opacity:.9;}
+.clearRow{margin-top:10px; text-align:center;}
+.clearRow button{background:none; color:var(--sub); font-size:12px; text-decoration:underline; padding:4px;}
+.mapwrap{overflow-x:auto;}
+svg{display:block; width:100%; height:auto; min-width:420px;}
+.qlabel{font-size:11px; font-weight:700; letter-spacing:.03em;}
+.bubble{cursor:pointer;}
+.bubble:hover circle{stroke-width:2.5;}
+.bname{font-size:10.5px; font-weight:600; pointer-events:none;}
+.list{margin-top:20px;}
+.list h2{font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--sub); margin:0 0 10px;}
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
+th{text-align:left; color:var(--sub); font-weight:600; font-size:11.5px; text-transform:uppercase; padding:6px 8px; border-bottom:1px solid var(--border);}
+td{padding:8px; border-bottom:1px solid var(--border); vertical-align:middle;}
+.tag{display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600;}
+.del{background:none; color:var(--sub); font-size:16px; line-height:1; padding:2px 6px;}
+.del:hover{color:var(--monetize);}
+.empty{color:var(--sub); font-size:13px; text-align:center; padding:20px;}
+.strategy{color:var(--sub); font-size:12.5px; max-width:240px; line-height:1.4;}
+.grouprow td{padding-top:16px; border-bottom:none;}
+.grouprow:first-child td{padding-top:6px;}
+@keyframes flashRow{ 0%,100%{background:transparent;} 40%{background:var(--nurture-bg);} }
+tr.flash{animation:flashRow 1.4s ease;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>My Account Map</h1>
+      <p class="sub">Score accounts by engagement and revenue to see who to prioritise</p>
+    </div>
+    <span class="savebadge" id="saveBadge">Saved to this browser</span>
+  </header>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Add account</h2>
+      <label>Client / company name</label>
+      <input type="text" id="cname" placeholder="e.g. Airtel Business">
+      <div class="scorepair">
+        <div>
+          <label>Engagement <span class="rangeval" id="engVal">3</span></label>
+          <input type="range" id="eng" min="1" max="5" step="2" value="3">
+        </div>
+        <div>
+          <label>Revenue score <span class="rangeval" id="revVal">3</span></label>
+          <input type="range" id="rev" min="1" max="5" step="2" value="3">
+        </div>
+      </div>
+      <div class="hint">1 = low, 5 = high</div>
+      <label>Revenue</label>
+      <input type="number" id="mrev" placeholder="e.g. 42000">
+      <div class="hint">Controls bubble size on the chart</div>
+      <button id="addBtn">+ Add account</button>
+      <div class="clearRow"><button id="clearBtn">Clear all data</button></div>
+    </div>
+
+    <div class="panel">
+      <h2>Map</h2>
+      <div class="mapwrap"><svg id="chart" viewBox="0 0 640 520"></svg></div>
+    </div>
+  </div>
+
+  <div class="list panel">
+    <h2>Accounts</h2>
+    <div id="listWrap"></div>
+  </div>
+</div>
+
+<script>
+const KEY = 'apm_accounts_v1';
+let accounts = [];
+try{
+  const raw = localStorage.getItem(KEY);
+  accounts = raw ? JSON.parse(raw) : [];
+}catch(e){ accounts = []; }
+
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(accounts)); flashBadge(); }
+  catch(e){ document.getElementById('saveBadge').textContent = 'Storage unavailable'; }
+}
+function flashBadge(){
+  const b = document.getElementById('saveBadge');
+  b.textContent = 'Saved ✓';
+  clearTimeout(flashBadge._t);
+  flashBadge._t = setTimeout(()=>{ b.textContent = 'Saved to this browser'; }, 1200);
+}
+
+function classify(a){
+  const highEng = a.eng >= 3, highRev = a.rev >= 3;
+  if(highEng && highRev) return {key:'grow', label:'Grow', color:'var(--grow)', bg:'var(--grow-bg)',
+    strategy:'Keep serving them well and look for upsell'};
+  if(!highEng && highRev) return {key:'monetize', label:'Monetize / At-risk', color:'var(--monetize)', bg:'var(--monetize-bg)',
+    strategy:"Mine the revenue while it lasts — check in urgently, they're paying but going quiet"};
+  if(highEng && !highRev) return {key:'nurture', label:'Nurture', color:'var(--nurture)', bg:'var(--nurture-bg)',
+    strategy:'They like you — offer them more'};
+  return {key:'deprioritize', label:'Deprioritize', color:'var(--deprior)', bg:'var(--deprior-bg)',
+    strategy:"Keep it light-touch, don't over-invest time"};
+}
+
+function render(){
+  renderCards();
+  renderChart();
+  renderList();
+}
+
+function renderCards(){
+  const counts = {grow:0,nurture:0,monetize:0,deprioritize:0};
+  accounts.forEach(a => counts[classify(a).key]++);
+  const cards = [
+    {n:accounts.length, l:'Total accounts'},
+    {n:counts.grow, l:'Grow'},
+    {n:counts.nurture, l:'Nurture'},
+    {n:counts.monetize, l:'Monetize / At-risk'},
+    {n:counts.deprioritize, l:'Deprioritize'},
+  ];
+  document.getElementById('cards').innerHTML = cards.map(c =>
+    `<div class="card"><div class="n">${c.n}</div><div class="l">${c.l}</div></div>`).join('');
+}
+
+function renderChart(){
+  const svg = document.getElementById('chart');
+  const W=640,H=520, L=60,R=36,T=44,B=60;
+  const plotW=W-L-R, plotH=H-T-B, midX=L+plotW/2, midY=T+plotH/2;
+  let s = '';
+  // quadrant backgrounds
+  s += `<rect x="${L}" y="${T}" width="${plotW/2}" height="${plotH/2}" fill="var(--monetize-bg)"/>`;
+  s += `<rect x="${midX}" y="${T}" width="${plotW/2}" height="${plotH/2}" fill="var(--grow-bg)"/>`;
+  s += `<rect x="${L}" y="${midY}" width="${plotW/2}" height="${plotH/2}" fill="var(--deprior-bg)"/>`;
+  s += `<rect x="${midX}" y="${midY}" width="${plotW/2}" height="${plotH/2}" fill="var(--nurture-bg)"/>`;
+  // axes
+  s += `<line x1="${L}" y1="${T}" x2="${L}" y2="${T+plotH}" stroke="var(--border)"/>`;
+  s += `<line x1="${L}" y1="${T+plotH}" x2="${L+plotW}" y2="${T+plotH}" stroke="var(--border)"/>`;
+  s += `<line x1="${midX}" y1="${T}" x2="${midX}" y2="${T+plotH}" stroke="var(--border)" stroke-dasharray="3,4"/>`;
+  s += `<line x1="${L}" y1="${midY}" x2="${L+plotW}" y2="${midY}" stroke="var(--border)" stroke-dasharray="3,4"/>`;
+  // quadrant labels
+  s += `<text x="${L+8}" y="${T+16}" class="qlabel" fill="var(--monetize)">MONETIZE / AT-RISK</text>`;
+  s += `<text x="${midX+8}" y="${T+16}" class="qlabel" fill="var(--grow)">GROW</text>`;
+  s += `<text x="${L+8}" y="${T+plotH-8}" class="qlabel" fill="var(--deprior)">DEPRIORITIZE</text>`;
+  s += `<text x="${midX+8}" y="${T+plotH-8}" class="qlabel" fill="var(--nurture)">NURTURE</text>`;
+  // axis titles
+  s += `<text x="${L+plotW/2}" y="${H-14}" text-anchor="middle" font-size="11.5" fill="var(--sub)">Engagement score →</text>`;
+  s += `<text x="16" y="${T+plotH/2}" text-anchor="middle" font-size="11.5" fill="var(--sub)" transform="rotate(-90 16 ${T+plotH/2})">Revenue score →</text>`;
+
+  const revenues = accounts.map(a=>Number(a.mrev)||0);
+  const maxRev = Math.max(1, ...revenues);
+  const labelGap = 18, pad = 4;
+
+  const nodes = accounts.map(a=>{
+    const highEng = a.eng>=3, highRev = a.rev>=3;
+    const rad = 10 + 20*Math.sqrt((Number(a.mrev)||0)/maxRev);
+    let x = L + ((a.eng-1)/4)*plotW;
+    let y = T + plotH - ((a.rev-1)/4)*plotH;
+    const xMin = highEng ? midX+pad : L+pad;
+    const xMax = highEng ? L+plotW-pad : midX-pad;
+    const yMin = highRev ? T+labelGap : midY+pad;
+    const yMax = highRev ? midY-pad : T+plotH-pad;
+    x = Math.min(Math.max(x, xMin+rad), Math.max(xMin+rad, xMax-rad));
+    y = Math.min(Math.max(y, yMin+rad), Math.max(yMin+rad, yMax-rad));
+    return {a, x, y, rad, xMin, xMax, yMin, yMax};
+  });
+
+  // separate overlapping bubbles, keeping each inside its own quadrant bounds
+  for(let iter=0; iter<60; iter++){
+    let moved = false;
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const n1=nodes[i], n2=nodes[j];
+        let dx=n2.x-n1.x, dy=n2.y-n1.y;
+        let dist=Math.sqrt(dx*dx+dy*dy);
+        const minDist = n1.rad+n2.rad+3;
+        if(dist < minDist){
+          moved = true;
+          if(dist < 0.001){ dx = (Math.random()-0.5); dy = (Math.random()-0.5); dist = 0.01; }
+          const overlap=(minDist-dist)/2, ux=dx/dist, uy=dy/dist;
+          n1.x -= ux*overlap; n1.y -= uy*overlap;
+          n2.x += ux*overlap; n2.y += uy*overlap;
+          [n1,n2].forEach(n=>{
+            n.x = Math.min(Math.max(n.x, n.xMin+n.rad), Math.max(n.xMin+n.rad, n.xMax-n.rad));
+            n.y = Math.min(Math.max(n.y, n.yMin+n.rad), Math.max(n.yMin+n.rad, n.yMax-n.rad));
+          });
+        }
+      }
+    }
+    if(!moved) break;
+  }
+
+  nodes.forEach(n=>{
+    const a = n.a, c = classify(a);
+    s += `<g class="bubble" onclick="highlightAccount('${a.id}')">
+      <circle cx="${n.x}" cy="${n.y}" r="${n.rad}" fill="${c.color}" fill-opacity="0.85" stroke="var(--card)" stroke-width="2"><title>${escapeHtml(a.name)} — click to locate in list below</title></circle>
+      <text x="${n.x}" y="${n.y - n.rad - 5}" text-anchor="middle" class="bname" fill="var(--text)">${escapeHtml(a.name)}</text>
+    </g>`;
+  });
+  svg.innerHTML = s;
+}
+
+const GROUP_ORDER = ['grow','nurture','monetize','deprioritize'];
+
+function renderList(){
+  const wrap = document.getElementById('listWrap');
+  if(!accounts.length){ wrap.innerHTML = '<div class="empty">No accounts added yet.</div>'; return; }
+
+  const groups = {grow:[], nurture:[], monetize:[], deprioritize:[]};
+  accounts.forEach(a => groups[classify(a).key].push(a));
+
+  let rows = '';
+  GROUP_ORDER.forEach(key=>{
+    const list = groups[key];
+    if(!list.length) return;
+    const c = classify(list[0]);
+    rows += `<tr class="grouprow"><td colspan="7"><span class="tag" style="background:${c.bg};color:${c.color}">${c.label} · ${list.length}</span></td></tr>`;
+    list.sort((a,b)=> (Number(b.mrev)||0)-(Number(a.mrev)||0)).forEach(a=>{
+      rows += `<tr id="row_${a.id}">
+        <td>${escapeHtml(a.name)}</td>
+        <td>${a.eng}</td>
+        <td>${a.rev}</td>
+        <td>${a.mrev ? '₹'+Number(a.mrev).toLocaleString() : '—'}</td>
+        <td><span class="tag" style="background:${c.bg};color:${c.color}">${c.label}</span></td>
+        <td class="strategy">${c.strategy}</td>
+        <td><button class="del" onclick="removeAccount('${a.id}')" title="Remove">✕</button></td>
+      </tr>`;
+    });
+  });
+  wrap.innerHTML = `<table><thead><tr><th>Client</th><th>Eng.</th><th>Rev.</th><th>Revenue</th><th>Priority</th><th>Strategy</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function removeAccount(id){
+  const a = accounts.find(x=>x.id===id);
+  if(a && !confirm(`Remove "${a.name}" from the map?`)) return;
+  accounts = accounts.filter(x=>x.id!==id);
+  save(); render();
+}
+window.removeAccount = removeAccount;
+
+function highlightAccount(id){
+  render();
+  const row = document.getElementById('row_'+id);
+  if(!row) return;
+  row.scrollIntoView({behavior:'smooth', block:'center'});
+  row.classList.add('flash');
+  setTimeout(()=> row.classList.remove('flash'), 1400);
+}
+window.highlightAccount = highlightAccount;
+
+document.getElementById('eng').addEventListener('input', e=> document.getElementById('engVal').textContent = e.target.value);
+document.getElementById('rev').addEventListener('input', e=> document.getElementById('revVal').textContent = e.target.value);
+
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('cname').value.trim();
+  if(!name){ document.getElementById('cname').focus(); return; }
+  const eng = Number(document.getElementById('eng').value);
+  const rev = Number(document.getElementById('rev').value);
+  const mrev = document.getElementById('mrev').value;
+  accounts.push({id: Date.now()+'_'+Math.random().toString(36).slice(2,7), name, eng, rev, mrev});
+  document.getElementById('cname').value = '';
+  document.getElementById('mrev').value = '';
+  save(); render();
+});
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  if(confirm('Clear all saved accounts?')){ accounts = []; save(); render(); }
+});
+
+render();
+</script>
+</body>
+</html>
